@@ -48,7 +48,7 @@ const TextField = ({
       color = theme.input.color[colorVariant].placeholder;
     }
     return color;
-  }, [isError, isEmptyValue, theme, state.isFocused]);
+  }, [isError, isEmptyValue, state.isFocused, theme.colors.text.error, theme.input.color, colorVariant]);
 
   return (
     <TextFieldMui

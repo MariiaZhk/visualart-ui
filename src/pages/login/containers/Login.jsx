@@ -15,6 +15,7 @@ import md5 from 'md5';
 import React, { useEffect, useState } from 'react';
 import TextField from 'components/TextField';
 import Typography from 'components/Typography';
+import { useCallback } from 'react';
 
 import * as errorCodes from '../constants/errorCodes';
 
@@ -85,7 +86,7 @@ function Login({
     signUpValidationErrors: [],
   });
 
-  const onCancelSignUp = () => setState({
+  const onCancelSignUp = useCallback(() => setState({
     ...state,
     externalErrors: [],
     signUpEmail: '',
@@ -96,7 +97,7 @@ function Login({
     signUpPasswordConfirm: '',
     signUpValidationErrors: [],
     isSignUpDialogOpened: false,
-  });
+  }));
 
   const getSignUpValidationErrors = () => {
     const errors = [];
@@ -129,7 +130,7 @@ function Login({
       ...state,
       externalErrors: messages,
     })
-  }, [errors]);
+  }, [errors, formatMessage, state]);
 
   useEffect(() => {
     if (state.isSignUpDialogOpened && !isFetchingSignUp && !isFailedSignUp) {
@@ -141,7 +142,7 @@ function Login({
       }
       onCancelSignUp();
     }
-  }, [isFetchingSignUp, isFailedSignUp]);
+  }, [isFetchingSignUp, isFailedSignUp, state.isSignUpDialogOpened, state.signUpLogin, state.signUpPassword, isAutoSignInAfterSignUp, onCancelSignUp, onSignIn]);
 
   return (
     <div className={classes.container}>

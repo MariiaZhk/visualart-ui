@@ -12,6 +12,8 @@ import { addAxiosInterceptors } from 'misc/requests';
 import * as pages from 'constants/pages';
 import AuthoritiesProvider from 'misc/providers/AuthoritiesProvider';
 import DefaultPage from 'pageProviders/Default';
+import ArtworksPage from 'pageProviders/Artworks';
+import ArtworkDetailsPage from 'pageProviders/ArtworkDetails';
 import Loading from 'components/Loading';
 import LoginPage from 'pageProviders/Login';
 import PageContainer from 'pageProviders/components/PageContainer';
@@ -19,7 +21,6 @@ import pageURLs from 'constants/pagesURLs';
 import SecretPage from 'pageProviders/Secret';
 import ThemeProvider from 'misc/providers/ThemeProvider';
 import UserProvider from 'misc/providers/UserProvider';
-
 import actionsUser from '../actions/user';
 import Header from '../components/Header';
 import IntlProvider from '../components/IntlProvider';
@@ -41,16 +42,14 @@ function App() {
     isFetchingUser,
   } = useSelector(({ user }) => user);
 
-  useEffect(() => {
-    addAxiosInterceptors({
-      onSignOut: () => dispatch(actionsUser.fetchSignOut()),
-    });
-    dispatch(actionsUser.fetchUser());
-    setState({
-      ...state,
-      componentDidMount: true,
-    });
-  }, []);
+ useEffect(() => {
+  addAxiosInterceptors({
+    onSignOut: () => dispatch(actionsUser.fetchSignOut()),
+  });
+  dispatch(actionsUser.fetchUser());
+  setState({ componentDidMount: true });
+}, [dispatch]);
+
 
   return (
     <UserProvider>
@@ -113,6 +112,15 @@ function App() {
                       )}
                       path={`${pageURLs[pages.login]}`}
                     />
+                    <Route
+  element={<ArtworksPage />}
+  path={`${pageURLs[pages.artworks]}`}
+/>
+<Route
+  element={<ArtworkDetailsPage />}
+  path={`${pageURLs[pages.artworks]}/:id`}
+/>
+
                     <Route
                       element={(
                         <MissedPage

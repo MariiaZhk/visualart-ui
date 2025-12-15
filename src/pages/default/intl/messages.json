@@ -1,3 +1,5 @@
 {
-  "title": "This is the first page that visitors to your site will see, place all the information they need here"
+  "title": "Find the art that works for you",
+  "subtitle": "Welcome to the Visual Art Gallery — explore and manage artworks using the link below",
+  "default": "View the Artwork Collection"
 }

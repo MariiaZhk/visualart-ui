@@ -9,6 +9,7 @@ const variants = {
   info: 'info',
   success: 'success',
   warning: 'warning',
+  
 };
 
 function Card({
@@ -16,10 +17,13 @@ function Card({
   children,
   disablePaddings = false,
   variant = variants.paper,
+  className,
+  sx = {}
 }) {
   const { theme } = useTheme();
   return (
-    <CardMUI
+    <CardMUI  
+    className={className}
       sx={{
         background: customBackground || theme.card.color.background[variant],
         borderRadius: '0px',
@@ -31,6 +35,8 @@ function Card({
           : `${theme.spacing(2)}px 0px`,
         transition: 'all 0.2s ease-out',
         width: '100%',
+          ...sx,
+        
       }}
     >
       {children}

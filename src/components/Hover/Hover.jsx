@@ -30,7 +30,7 @@ function Hover({
   children,
   light = false,
   onClick,
-  selected = false,
+  selected = false,onMouseEnter, onMouseLeave
 }) {
   const { theme } = useTheme();
   const classes = getClasses({ theme });
@@ -45,6 +45,8 @@ function Hover({
           : !selected && classes.hovered
       )}
       onClick={onClick}
+         onMouseEnter={onMouseEnter}       // ← Додано
+      onMouseLeave={onMouseLeave}  
     >
       {children}
     </div>

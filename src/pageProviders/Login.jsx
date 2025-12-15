@@ -24,7 +24,7 @@ const Login = (props) => {
         replace: true,
       });
     }
-  }, [user.isAuthorized]);
+  }, [changePage, locationSearch, user.isAuthorized]);
 
   return (
     <PageContainer>
