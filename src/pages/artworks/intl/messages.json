@@ -1,12 +1,27 @@
 {
-  "title": "Visual Artworks Collection",
-  "delete_confirm": "Are you sure you want to delete this artwork?",
-  "delete": "Delete",
-  "cancel": "Cancel",
-  "delete_success": "Entity deleted successfully!",
-  "delete_error": "Error while deleting. Try again.",
+  "apply": "Apply",
+  "clear": "Clear",
+
+  "filter.artist": "Search by Artist",
+  "filter.title": "Search by Title",
+  "filter.sortBy": "Sort by",
+  "filter.sort.titleAsc": "Title A → Z",
+  "filter.sort.titleDesc": "Title Z → A",
+  "filter.sort.yearAsc": "Year (Oldest first)",
+  "filter.sort.yearDesc": "Year (Newest first)",
 
   "loading_artworks": "Loading artworks...",
   "artworks_error": "Error loading artworks",
-  "no_artworks": "No artworks found"
+  "no_artworks": "No artworks found",
+
+  "artist": "Artist",
+  "year": "Year",
+
+  "delete_confirm": "Are you sure you want to delete this artwork?",
+  "delete": "Delete",
+  "cancel": "Cancel",
+  "delete_success": "Artwork deleted successfully!",
+  "delete_error": "Error while deleting. Try again.",
+
+  "add_artwork": "Add artwork"
 }

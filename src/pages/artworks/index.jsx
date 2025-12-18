@@ -7,9 +7,7 @@ import getMessages from './intl';
 import Artworks from './containers/Artworks';
 
 function Index(props) {
-  const {
-    lang,
-  } = useLocationSearch();
+  const { lang } = useLocationSearch();
   const messages = useMemo(() => getMessages(lang), [lang]);
   return (
     <IntlProvider messages={messages}>

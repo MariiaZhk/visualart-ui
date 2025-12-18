@@ -15,9 +15,9 @@ function SearchParamsConfigurator() {
 
   useEffect(() => {
     let isSearchParamsUpdated = false;
-    if (!searchParams.has(locationSearch.lang)
-      || !Object.values(languages)
-        .includes(searchParams.get(locationSearch.lang) || '')
+    if (
+      !searchParams.has(locationSearch.lang) ||
+      !Object.values(languages).includes(searchParams.get(locationSearch.lang) || '')
     ) {
       searchParams.set(locationSearch.lang, DEFAULT_LANGUAGE);
       isSearchParamsUpdated = true;
@@ -25,7 +25,7 @@ function SearchParamsConfigurator() {
     if (isSearchParamsUpdated) {
       setSearchParams(searchParams, { replace: true });
     }
-  }, [searchParams]);
+  }, [searchParams, setSearchParams]);
 }
 
 export default SearchParamsConfigurator;

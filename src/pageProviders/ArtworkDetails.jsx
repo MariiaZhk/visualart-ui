@@ -1,7 +1,5 @@
-
 import React from 'react';
-import ArtworkDetailsPage from 'pages/artworkDetails'
-
+import ArtworkDetailsPage from 'pages/artworkDetails';
 import PageContainer from './components/PageContainer';
 
 const ArtworkDetails = (props) => {

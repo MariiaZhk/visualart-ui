@@ -1,18 +1,11 @@
 import React from 'react';
-import {
-  IntlProvider as ReactIntlProvider,
-} from 'react-intl';
+import { IntlProvider as ReactIntlProvider } from 'react-intl';
 
 import useLocationSearch from 'misc/hooks/useLocationSearch';
 import { DEFAULT_LANGUAGE, locales } from 'misc/constants/languages';
 
-function IntlProvider({
-  children,
-  messages,
-}) {
-  const {
-    lang,
-  } = useLocationSearch();
+function IntlProvider({ children, messages }) {
+  const { lang } = useLocationSearch();
 
   return (
     <ReactIntlProvider

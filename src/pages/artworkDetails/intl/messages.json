@@ -1,1 +1,5 @@
-{"title": "Find the art that works for you"}
+{
+  "loading_artwork": "Loading artworks...",
+  "artwork_error": "Error loading artworks",
+  "no_artwork": "No artworks found"
+}

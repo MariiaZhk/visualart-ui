@@ -6,9 +6,7 @@ import getMessages from './intl';
 import Default from './containers/Default';
 
 function Index(props) {
-  const {
-    lang,
-  } = useLocationSearch();
+  const { lang } = useLocationSearch();
   const messages = useMemo(() => getMessages(lang), [lang]);
   return (
     <IntlProvider messages={messages}>

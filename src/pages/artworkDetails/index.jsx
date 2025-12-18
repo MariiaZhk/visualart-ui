@@ -3,13 +3,10 @@ import IntlProvider from 'misc/providers/IntlProvider';
 import useLocationSearch from 'misc/hooks/useLocationSearch';
 
 import getMessages from './intl';
-
 import ArtworkDetails from './containers/ArtworkDetails';
 
 function Index(props) {
-  const {
-    lang,
-  } = useLocationSearch();
+  const { lang } = useLocationSearch();
   const messages = useMemo(() => getMessages(lang), [lang]);
   return (
     <IntlProvider messages={messages}>
