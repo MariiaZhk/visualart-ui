@@ -11,12 +11,11 @@ The interface supports filtering, sorting, pagination, and user-friendly UX with
 ## 📌 Technologies
 
 - React 18 + Hooks
-- Redux Toolkit
-- React Router v6
+- Redux
+- React Router
 - Axios for API requests
 - Material UI + custom UI components (Card, Button, Snackbar, Dialog)
 - Custom form validation
-- Jest + React Testing Library for testing
 
 ---
 
@@ -29,10 +28,10 @@ git clone https://github.com/MariiaZhk/visualart-ui.git
 cd visualart-ui
 ```
 
-2. Switch to your feature branch (with Block 3 implementation):
+2. Switch to branch (with Block 3 implementation):
 
 ```bash
-git checkout visualart-ui-feature-block3-visualart-ui
+git checkout feature/block3-visualart-ui
 ```
 
 3. Install dependencies:
@@ -55,7 +54,7 @@ yarn start
 
 ## 🌐 How the Application Works
 
-The app runs locally and communicates with the backend [VisualArt API](https://github.com/MariiaZhk/visualart-api) to fetch and manage data about artworks and artists.
+The app runs locally and communicates with the backend [VisualArt Service](https://github.com/MariiaZhk/visualart-api) to fetch and manage data about artworks and artists.
 
 ### Main Features:
 
