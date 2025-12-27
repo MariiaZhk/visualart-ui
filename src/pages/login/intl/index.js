@@ -6,9 +6,8 @@ function getMessages(lang) {
   const defaultMessages = require('./messages.json');
   let messages;
   try {
-    messages = lang === DEFAULT_LANG
-      ? defaultMessages
-      : require(`./messages.${lang.toLowerCase()}.json`);
+    messages =
+      lang === DEFAULT_LANG ? defaultMessages : require(`./messages.${lang.toLowerCase()}.json`);
   } catch (e) {
     messages = defaultMessages;
   }

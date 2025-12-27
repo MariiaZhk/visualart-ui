@@ -1,64 +1,42 @@
-import { createUseStyles } from 'react-jss';
-import classNames from 'classnames';
 import React from 'react';
+import { createUseStyles } from 'react-jss';
 import useTheme from 'misc/hooks/useTheme';
 
-const getClasses = createUseStyles((theme) => ({
-  bottomStub: {
-    height: '16px',
-  },
-  container: {
+const useStyles = createUseStyles({
+  outer: ({ theme }) => ({
+    height: `calc(100vh - ${theme.header.height}px)`,
+    width: '100%',
     background: theme.pageContainer.color.background,
     display: 'flex',
-    height: '100%',
-    overflowY: 'auto',
-  },
-  content: {
+    justifyContent: 'center',
+    overflow: 'hidden',
+  }),
+
+  middle: ({ theme }) => ({
+    width: '100%',
+    maxWidth: theme.pageContainer.content.width,
     background: theme.pageContainer.content.color.background,
     display: 'flex',
     flexDirection: 'column',
-    maxWidth: theme.pageContainer.content.width,
-    width: '100%',
-  },
-  contentContainer: {
-    display: 'flex',
-    overflowX: 'auto',
-    justifyContent: 'center',
-    width: '100%',
-  },
-  fullWidth: {
-    maxWidth: '100% !important',
-  },
-  innerContent: {
-    height: '100%',
-    padding: `${theme.spacing(2)}px`,
-  },
-  sideBarStub: {
-    minWidth: `${theme.sideBar.width}px`,
-    width: '20%',
-  },
-}));
+  }),
 
-function PageContainer({
-  children,
-  fullWidth = false,
-}) {
+  inner: ({ theme }) => ({
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    padding: theme.spacing(2),
+    overflowY: 'auto',
+  }),
+});
+
+function PageContainer({ children }) {
   const { theme } = useTheme();
-  const classes = getClasses({ theme });
+  const classes = useStyles({ theme });
+
   return (
-    <div className={classes.container}>
-      <div className={classes.contentContainer}>
-        <div
-          className={classNames(
-            classes.content,
-            fullWidth && classes.fullWidth
-          )}
-        >
-          <div className={classes.innerContent}>
-            {children}
-            <div className={classes.bottomStub} />
-          </div>
-        </div>
+    <div className={classes.outer}>
+      <div className={classes.middle}>
+        <div className={classes.inner}>{children}</div>
       </div>
     </div>
   );

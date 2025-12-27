@@ -15,6 +15,7 @@ import md5 from 'md5';
 import React, { useEffect, useState } from 'react';
 import TextField from 'components/TextField';
 import Typography from 'components/Typography';
+import { useCallback } from 'react';
 
 import * as errorCodes from '../constants/errorCodes';
 
@@ -85,18 +86,22 @@ function Login({
     signUpValidationErrors: [],
   });
 
-  const onCancelSignUp = () => setState({
-    ...state,
-    externalErrors: [],
-    signUpEmail: '',
-    signUpFirstName: '',
-    signUpLastName: '',
-    signUpLogin: '',
-    signUpPassword: '',
-    signUpPasswordConfirm: '',
-    signUpValidationErrors: [],
-    isSignUpDialogOpened: false,
-  });
+  const onCancelSignUp = useCallback(
+    () =>
+      setState((prev) => ({
+        ...prev,
+        externalErrors: [],
+        signUpEmail: '',
+        signUpFirstName: '',
+        signUpLastName: '',
+        signUpLogin: '',
+        signUpPassword: '',
+        signUpPasswordConfirm: '',
+        signUpValidationErrors: [],
+        isSignUpDialogOpened: false,
+      })),
+    [],
+  );
 
   const getSignUpValidationErrors = () => {
     const errors = [];
@@ -122,14 +127,16 @@ function Login({
 
   useEffect(() => {
     const errorCodeValues = Object.values(errorCodes);
-    const messages = errors.map(error => errorCodeValues.includes(error.code)
-      ? formatMessage({ id: `error.${error.code}` })
-      : error.description);
+    const messages = errors.map((error) =>
+      errorCodeValues.includes(error.code)
+        ? formatMessage({ id: `error.${error.code}` })
+        : error.description,
+    );
     setState({
       ...state,
       externalErrors: messages,
-    })
-  }, [errors]);
+    });
+  }, [errors, formatMessage, state]);
 
   useEffect(() => {
     if (state.isSignUpDialogOpened && !isFetchingSignUp && !isFailedSignUp) {
@@ -141,63 +148,80 @@ function Login({
       }
       onCancelSignUp();
     }
-  }, [isFetchingSignUp, isFailedSignUp]);
+  }, [
+    isFetchingSignUp,
+    isFailedSignUp,
+    state.isSignUpDialogOpened,
+    state.signUpLogin,
+    state.signUpPassword,
+    isAutoSignInAfterSignUp,
+    onCancelSignUp,
+    onSignIn,
+  ]);
 
   return (
     <div className={classes.container}>
       <div className={classes.content}>
         <TextField
           label={formatMessage({ id: 'field.loginOrEmail' })}
-          onChange={({ target }) => setState({
-            ...state,
-            emailOrLogin: target.value,
-          })}
+          onChange={({ target }) =>
+            setState({
+              ...state,
+              emailOrLogin: target.value,
+            })
+          }
           value={state.emailOrLogin}
         />
         <TextField
-          AdornmentEnd={(
+          AdornmentEnd={
             <IconButton
-              colorVariant="secondary"
-              onPress={() => setState({
-                ...state,
-                isShowPassword: true,
-              })}
-              onRelease={() => setState({
-                ...state,
-                isShowPassword: false,
-              })}
-            >
-              {state.isShowPassword
-                ? <IconVisibilityOn size={24} />
-                : <IconVisibilityOff size={24} />
+              colorVariant='secondary'
+              onPress={() =>
+                setState({
+                  ...state,
+                  isShowPassword: true,
+                })
               }
+              onRelease={() =>
+                setState({
+                  ...state,
+                  isShowPassword: false,
+                })
+              }
+            >
+              {state.isShowPassword ? (
+                <IconVisibilityOn size={24} />
+              ) : (
+                <IconVisibilityOff size={24} />
+              )}
             </IconButton>
-          )}
+          }
           label={formatMessage({ id: 'field.password' })}
           inputType={state.isShowPassword ? 'text' : 'password'}
-          onChange={({ target }) => setState({
-            ...state,
-            password: target.value,
-          })}
+          onChange={({ target }) =>
+            setState({
+              ...state,
+              password: target.value,
+            })
+          }
           value={state.password}
         />
-        {isFailedSignIn && state.externalErrors.map(errorMessage => (
-          <Typography color="error">
-            {errorMessage}
-          </Typography>
-        ))}
+        {isFailedSignIn &&
+          state.externalErrors.map((errorMessage) => (
+            <Typography color='error'>{errorMessage}</Typography>
+          ))}
         <div className={classes.buttons}>
           <Button
-            colorVariant="secondary"
-            onClick={() => setState({
-              ...state,
-              isSignUpDialogOpened: true,
-            })}
-            variant="secondary"
+            colorVariant='secondary'
+            onClick={() =>
+              setState({
+                ...state,
+                isSignUpDialogOpened: true,
+              })
+            }
+            variant='secondary'
           >
-            <Typography>
-              {formatMessage({ id: 'signUp' })}
-            </Typography>
+            <Typography>{formatMessage({ id: 'signUp' })}</Typography>
           </Button>
           <Button
             disabled={!state.emailOrLogin || !state.password}
@@ -207,39 +231,30 @@ function Login({
               onSignIn({
                 email: withEmail ? state.emailOrLogin : null,
                 login: withEmail ? null : state.emailOrLogin,
-                password: md5(state.password)
+                password: md5(state.password),
               });
             }}
-            variant="primary"
+            variant='primary'
           >
-            <Typography color="inherit">
-              <strong>
-                {formatMessage({ id: 'signIn' })}
-              </strong>
+            <Typography color='inherit'>
+              <strong>{formatMessage({ id: 'signIn' })}</strong>
             </Typography>
           </Button>
         </div>
       </div>
-      <Dialog
-        maxWidth="xs"
-        open={state.isSignUpDialogOpened}
-      >
+      <Dialog maxWidth='xs' open={state.isSignUpDialogOpened}>
         <Card>
           {isFailedSignUp && !!state.externalErrors.length && (
-            <Card variant="error">
+            <Card variant='error'>
               <CardTitle>
-                {state.externalErrors.map(errorMessage => (
-                  <Typography color="error">
-                    {errorMessage}
-                  </Typography>
+                {state.externalErrors.map((errorMessage) => (
+                  <Typography color='error'>{errorMessage}</Typography>
                 ))}
               </CardTitle>
             </Card>
           )}
           <CardTitle>
-            <Typography variant="subTitle">
-              {formatMessage({ id: 'signUp' })}
-            </Typography>
+            <Typography variant='subTitle'>{formatMessage({ id: 'signUp' })}</Typography>
             <IconButton onClick={onCancelSignUp}>
               <IconClose size={24} />
             </IconButton>
@@ -247,99 +262,108 @@ function Login({
           <CardContent>
             <div className={classes.dialogContent}>
               <TextField
-                helperText={state.signUpValidationErrors
-                  .includes(errorTypes.EMPTY_SIGN_UP_LOGIN)
-                && formatMessage({
-                  id: `signUp.error.${errorTypes.EMPTY_SIGN_UP_LOGIN}`,
-                })}
-                isError={state.signUpValidationErrors
-                  .includes(errorTypes.EMPTY_SIGN_UP_LOGIN)}
+                helperText={
+                  state.signUpValidationErrors.includes(errorTypes.EMPTY_SIGN_UP_LOGIN) &&
+                  formatMessage({
+                    id: `signUp.error.${errorTypes.EMPTY_SIGN_UP_LOGIN}`,
+                  })
+                }
+                isError={state.signUpValidationErrors.includes(errorTypes.EMPTY_SIGN_UP_LOGIN)}
                 label={formatMessage({ id: 'field.login' })}
-                onChange={({ target }) => setState({
-                  ...state,
-                  signUpLogin: target.value,
-                })}
+                onChange={({ target }) =>
+                  setState({
+                    ...state,
+                    signUpLogin: target.value,
+                  })
+                }
                 required
                 value={state.signUpLogin}
               />
               <TextField
-                helperText={[
-                  errorTypes.EMPTY_SIGN_UP_EMAIL,
-                  errorTypes.INVALID_EMAIL,
-                ]
-                  .filter(errorType => state.signUpValidationErrors
-                    .includes(errorType))
-                  .map(errorType => formatMessage({
-                    id: `signUp.error.${errorType}`
-                  }))
+                helperText={[errorTypes.EMPTY_SIGN_UP_EMAIL, errorTypes.INVALID_EMAIL]
+                  .filter((errorType) => state.signUpValidationErrors.includes(errorType))
+                  .map((errorType) =>
+                    formatMessage({
+                      id: `signUp.error.${errorType}`,
+                    }),
+                  )
                   .join('; ')}
-                isError={[
-                  errorTypes.EMPTY_SIGN_UP_EMAIL,
-                  errorTypes.INVALID_EMAIL,
-                ].some(errorType => state.signUpValidationErrors
-                  .includes(errorType))}
+                isError={[errorTypes.EMPTY_SIGN_UP_EMAIL, errorTypes.INVALID_EMAIL].some(
+                  (errorType) => state.signUpValidationErrors.includes(errorType),
+                )}
                 label={formatMessage({ id: 'field.email' })}
-                onChange={({ target }) => setState({
-                  ...state,
-                  signUpEmail: target.value,
-                })}
+                onChange={({ target }) =>
+                  setState({
+                    ...state,
+                    signUpEmail: target.value,
+                  })
+                }
                 required
                 value={state.signUpEmail}
               />
               <TextField
                 label={formatMessage({ id: 'field.firstName' })}
-                onChange={({ target }) => setState({
-                  ...state,
-                  signUpFirstName: target.value,
-                })}
+                onChange={({ target }) =>
+                  setState({
+                    ...state,
+                    signUpFirstName: target.value,
+                  })
+                }
                 value={state.signUpFirstName}
               />
               <TextField
                 label={formatMessage({ id: 'field.lastName' })}
-                onChange={({ target }) => setState({
-                  ...state,
-                  signUpLastName: target.value,
-                })}
+                onChange={({ target }) =>
+                  setState({
+                    ...state,
+                    signUpLastName: target.value,
+                  })
+                }
                 value={state.signUpLastName}
               />
               <TextField
-                AdornmentEnd={(
+                AdornmentEnd={
                   <IconButton
-                    colorVariant="secondary"
-                    onPress={() => setState({
-                      ...state,
-                      isShowPassword: true,
-                    })}
-                    onRelease={() => setState({
-                      ...state,
-                      isShowPassword: false,
-                    })}
-                  >
-                    {state.isShowPassword
-                      ? <IconVisibilityOn size={24} />
-                      : <IconVisibilityOff size={24} />
+                    colorVariant='secondary'
+                    onPress={() =>
+                      setState({
+                        ...state,
+                        isShowPassword: true,
+                      })
                     }
+                    onRelease={() =>
+                      setState({
+                        ...state,
+                        isShowPassword: false,
+                      })
+                    }
+                  >
+                    {state.isShowPassword ? (
+                      <IconVisibilityOn size={24} />
+                    ) : (
+                      <IconVisibilityOff size={24} />
+                    )}
                   </IconButton>
-                )}
-                helperText={[
-                  errorTypes.EMPTY_SIGN_UP_PASSWORD,
-                ]
-                  .filter(errorType => state.signUpValidationErrors
-                    .includes(errorType))
-                  .map(errorType => formatMessage({
-                    id: `signUp.error.${errorType}`
-                  }))
+                }
+                helperText={[errorTypes.EMPTY_SIGN_UP_PASSWORD]
+                  .filter((errorType) => state.signUpValidationErrors.includes(errorType))
+                  .map((errorType) =>
+                    formatMessage({
+                      id: `signUp.error.${errorType}`,
+                    }),
+                  )
                   .join('; ')}
                 label={formatMessage({ id: 'field.password' })}
                 inputType={state.isShowPassword ? 'text' : 'password'}
-                isError={[
-                  errorTypes.EMPTY_SIGN_UP_PASSWORD,
-                ].some(errorType => state.signUpValidationErrors
-                  .includes(errorType))}
-                onChange={({ target }) => setState({
-                  ...state,
-                  signUpPassword: target.value,
-                })}
+                isError={[errorTypes.EMPTY_SIGN_UP_PASSWORD].some((errorType) =>
+                  state.signUpValidationErrors.includes(errorType),
+                )}
+                onChange={({ target }) =>
+                  setState({
+                    ...state,
+                    signUpPassword: target.value,
+                  })
+                }
                 required
                 value={state.signUpPassword}
               />
@@ -348,37 +372,33 @@ function Login({
                   errorTypes.EMPTY_SIGN_UP_PASSWORD_CONFIRM,
                   errorTypes.PASSWORDS_MISMATCHES,
                 ]
-                  .filter(errorType => state.signUpValidationErrors
-                    .includes(errorType))
-                  .map(errorType => formatMessage({
-                    id: `signUp.error.${errorType}`
-                  }))
+                  .filter((errorType) => state.signUpValidationErrors.includes(errorType))
+                  .map((errorType) =>
+                    formatMessage({
+                      id: `signUp.error.${errorType}`,
+                    }),
+                  )
                   .join('; ')}
                 label={formatMessage({ id: 'field.passwordConfirm' })}
-                inputType="password"
+                inputType='password'
                 isError={[
                   errorTypes.EMPTY_SIGN_UP_PASSWORD_CONFIRM,
                   errorTypes.PASSWORDS_MISMATCHES,
-                ].some(errorType => state.signUpValidationErrors
-                  .includes(errorType))}
-                onChange={({ target }) => setState({
-                  ...state,
-                  signUpPasswordConfirm: target.value,
-                })}
+                ].some((errorType) => state.signUpValidationErrors.includes(errorType))}
+                onChange={({ target }) =>
+                  setState({
+                    ...state,
+                    signUpPasswordConfirm: target.value,
+                  })
+                }
                 required
                 value={state.signUpPasswordConfirm}
               />
             </div>
           </CardContent>
           <CardActions>
-            <Button
-              colorVariant="secondary"
-              onClick={onCancelSignUp}
-              variant="secondary"
-            >
-              <Typography>
-                {formatMessage({ id: 'btn.cancel' })}
-              </Typography>
+            <Button colorVariant='secondary' onClick={onCancelSignUp} variant='secondary'>
+              <Typography>{formatMessage({ id: 'btn.cancel' })}</Typography>
             </Button>
             <Button
               isLoading={isFetchingSignUp}
@@ -398,12 +418,10 @@ function Login({
                   signUpValidationErrors: validationErrors,
                 });
               }}
-              variant="primary"
+              variant='primary'
             >
-              <Typography color="inherit">
-                <strong>
-                  {formatMessage({ id: 'btn.signUp.apply' })}
-                </strong>
+              <Typography color='inherit'>
+                <strong>{formatMessage({ id: 'btn.signUp.apply' })}</strong>
               </Typography>
             </Button>
           </CardActions>

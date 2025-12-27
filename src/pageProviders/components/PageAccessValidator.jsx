@@ -29,7 +29,7 @@ function PageAccessValidator({
 
   const hasAccess = useMemo(
     () => validateAccess(neededAuthorities, mode),
-    [neededAuthorities, validateAccess]
+    [mode, neededAuthorities, validateAccess]
   );
 
   useEffect(() => {
@@ -57,7 +57,7 @@ function PageAccessValidator({
         }));
       }
     }
-  }, [isFetchingUser, isAuthorized, hasAccess]);
+  }, [isFetchingUser, isAuthorized, hasAccess, isFetchingSignIn, changePage, locationSearch, location.pathname]);
 
   return (
     <>

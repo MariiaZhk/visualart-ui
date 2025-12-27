@@ -115,7 +115,7 @@ const theme = {
           secondary: commonColors.text.secondary,
         },
       },
-    }
+    },
   },
   link: {
     color: '#1C7FDB',
@@ -131,7 +131,7 @@ const theme = {
       primary: {
         background: commonColors.background.secondary,
       },
-    }
+    },
   },
   menuItem: {
     color: {
@@ -143,7 +143,7 @@ const theme = {
         backgroundHovered: 'rgba(0, 0, 0, 0.05)',
         backgroundSelected: 'rgba(0, 0, 0, 0.1)',
       },
-    }
+    },
   },
   pageContainer: {
     border: '#E6E6E6',
@@ -201,8 +201,8 @@ const theme = {
       },
       title: {
         fontFamily: 'sans-serif',
-        fontSize: '20px',
-        fontWeight: 400,
+        fontSize: '24px',
+        fontWeight: 600,
         letterSpacing: '0.03333em',
         lineHeight: 1.3,
       },

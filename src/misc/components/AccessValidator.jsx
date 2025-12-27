@@ -10,7 +10,7 @@ function AccessValidator({
   const validateAccess = useAccessValidate();
   const hasAccess = useMemo(
     () => validateAccess(neededAuthorities, mode),
-    [neededAuthorities, validateAccess]);
+    [mode, neededAuthorities, validateAccess]);
   return (
     <>
       {hasAccess ? children : null}
