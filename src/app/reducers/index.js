@@ -1,11 +1,13 @@
 import { combineReducers } from 'redux';
 
 import user from './user';
-import artworks from './artworks';
+import artworksList from './artworksList';
+import artworkDetails from './artworkDetails';
 import artists from './artists';
 
 export default combineReducers({
   user,
-  artworks,
-  artists
+  artworksList,
+  artworkDetails,
+  artists,
 });

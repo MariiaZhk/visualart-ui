@@ -24,7 +24,7 @@ const useStyles = createUseStyles({
     flex: 1,
     display: 'flex',
     flexDirection: 'column',
-    padding: theme.spacing(3),
+    padding: theme.spacing(2),
     overflowY: 'auto',
   }),
 });

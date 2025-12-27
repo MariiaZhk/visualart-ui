@@ -4,21 +4,36 @@ import {
   REQUEST_ARTISTS,
   RECEIVE_ARTISTS,
   ERROR_ARTISTS,
-} from '../constants/actionTypes';
-
-const requestArtists = () => ({ type: REQUEST_ARTISTS });
-const receiveArtists = (data) => ({ type: RECEIVE_ARTISTS, payload: data });
-const errorArtists = (errors) => ({ type: ERROR_ARTISTS, payload: errors });
+  CREATE_ARTIST_REQUEST,
+  CREATE_ARTIST_SUCCESS,
+  CREATE_ARTIST_ERROR,
+} from 'app/constants/actionTypes';
 
 export const fetchArtists = () => async (dispatch) => {
-  dispatch(requestArtists());
+  dispatch({ type: REQUEST_ARTISTS });
+
   try {
     const data = await axios.get(`${config.ARTWORKS_SERVICE}/artists`);
-    dispatch(receiveArtists(data));
+    console.log('FETCH ARTISTS DATA:', data);
+    dispatch({ type: RECEIVE_ARTISTS, payload: data });
+    return { payload: data };
   } catch (err) {
-    dispatch(errorArtists(err));
+    dispatch({ type: ERROR_ARTISTS, payload: err });
+    return { payload: null, error: err };
   }
 };
 
-const artistsActions = { fetchArtists };
-export default artistsActions;
+export const createArtist = (artist) => async (dispatch) => {
+  dispatch({ type: CREATE_ARTIST_REQUEST });
+
+  try {
+    const data = await axios.post(`${config.ARTWORKS_SERVICE}/artists`, artist);
+    console.log('CREATE ARTIST DATA:', data);
+    dispatch({ type: CREATE_ARTIST_SUCCESS, payload: data });
+
+    return { payload: data };
+  } catch (err) {
+    dispatch({ type: CREATE_ARTIST_ERROR, payload: err });
+    return { payload: null, error: err.response?.data || err };
+  }
+};

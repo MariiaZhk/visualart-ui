@@ -1,10 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useIntl } from 'react-intl';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { Grid, Box } from '@mui/material';
 
-import ArtworksFilter from './ArtworksFilter';
+import ArtworksFilter from './components/ArtworksFilter';
+import { fetchArtworks, deleteArtwork } from 'app/actions/artworksList';
+
+import Pagination from 'components/Pagination';
+import Loading from 'components/Loading';
+import Hover from 'components/Hover';
 import Card from 'components/Card';
 import CardTitle from 'components/CardTitle';
 import CardContent from 'components/CardContent';
@@ -14,78 +18,81 @@ import Delete from 'components/icons/Delete';
 import Dialog from 'components/Dialog';
 import Button from 'components/Button';
 import Snackbar from 'components/Snackbar';
-import Pagination from 'components/Pagination';
 import FloatingActionButton from 'app/components/FloatingActionButton';
 import AddIcon from 'components/icons/Add';
+
 import pageURLs from 'constants/pagesURLs';
 import * as pages from 'constants/pages';
 import theme from 'misc/providers/ThemeProvider/themes/default';
-import artworksActions from '../../../app/actions/artworks';
-import Loading from 'components/Loading';
-import Hover from 'components/Hover';
 
 function Artworks() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { formatMessage } = useIntl();
-  const { items, isFetching, errors, totalPages } = useSelector((state) => state.artworks);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
+  const { items, totalItems, isLoading, error } = useSelector((state) => state.artworksList);
 
   const [hoveredId, setHoveredId] = useState(null);
   const [deleteDialog, setDeleteDialog] = useState({ open: false, id: null, error: null });
-  const [successMessage, setSuccessMessage] = useState('');
-  const [searchParams, setSearchParams] = useSearchParams();
 
-  const [filters, setFilters] = useState({
-    artistId: searchParams.get('artistId') || null,
-    title: searchParams.get('title') || '',
-    sortBy: searchParams.get('sortBy') || 'title',
-    sortDir: searchParams.get('sortDir') || 'asc',
-    page: Number(searchParams.get('page')) || 1,
-    size: Number(searchParams.get('size')) || 8,
+  const [notification, setNotification] = useState({
+    open: location.state?.successMessage ? true : false,
+    message: location.state?.successMessage || '',
+    type: 'success',
   });
 
   useEffect(() => {
-    const { artistId, title, sortBy, sortDir, page, size } = filters;
-    dispatch(artworksActions.fetchArtworks({ artistId, title, sortBy, sortDir, page, size }));
+    if (location.state?.successMessage) {
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location, navigate]);
 
-    setSearchParams({
-      artistId: artistId || '',
-      title: title || '',
-      sortBy,
-      sortDir,
-      page,
-      size,
+  const normalize = (v) => (v === 'null' || v === '' ? null : v);
+  const filters = useMemo(
+    () => ({
+      artistId: normalize(searchParams.get('artistId')),
+      title: normalize(searchParams.get('title')) || '',
+      sortBy: searchParams.get('sortBy') || 'title',
+      sortDir: searchParams.get('sortDir') || 'asc',
+      page: Number(searchParams.get('page')) || 1,
+      size: Number(searchParams.get('size')) || 8,
+    }),
+    [searchParams],
+  );
+
+  useEffect(() => {
+    dispatch(fetchArtworks(filters));
+  }, [dispatch, filters]);
+
+  const updateSearch = (next) => {
+    const params = { ...filters, ...next };
+    Object.keys(params).forEach((k) => {
+      if (params[k] === null || params[k] === '') delete params[k];
     });
-  }, [dispatch, filters, setSearchParams]);
+    setSearchParams(params);
+  };
 
   const handleDelete = async (id) => {
-    try {
-      dispatch(artworksActions.deleteArtwork(id));
+    const result = await dispatch(deleteArtwork(id));
+    if (result.error) {
+      setDeleteDialog((prev) => ({ ...prev, error: 'Error while deleting. Try again.' }));
+      setNotification({ open: true, message: 'Error deleting artwork', type: 'error' });
+    } else {
       setDeleteDialog({ open: false, id: null, error: null });
-      setSuccessMessage(formatMessage({ id: 'delete_success' }));
-    } catch {
-      setDeleteDialog((prev) => ({ ...prev, error: formatMessage({ id: 'delete_error' }) }));
+      setNotification({ open: true, message: 'Artwork deleted successfully!', type: 'success' });
     }
-  };
-
-  const handleApplyFilters = (newFilters) => {
-    setFilters(newFilters);
-  };
-
-  const handlePageChange = (page) => {
-    setFilters((prev) => ({ ...prev, page }));
   };
 
   return (
     <>
-      <ArtworksFilter initialFilters={filters} onApply={handleApplyFilters} />
+      <ArtworksFilter initialFilters={filters} onApply={(f) => updateSearch({ ...f, page: 1 })} />
 
-      {isFetching ? (
-        <Loading variant='loading'>{formatMessage({ id: 'loading_artworks' })}</Loading>
-      ) : errors.length > 0 ? (
-        <Loading variant='error'>{formatMessage({ id: 'artworks_error' })}</Loading>
-      ) : items.length === 0 ? (
-        <Loading variant='noData'>{formatMessage({ id: 'no_artworks' })}</Loading>
+      {isLoading ? (
+        <Loading>Loading artworks...</Loading>
+      ) : error ? (
+        <Loading variant='error'>Error loading artworks</Loading>
+      ) : !items.length ? (
+        <Loading variant='noData'>No artworks found</Loading>
       ) : (
         <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
           <Grid container spacing={2}>
@@ -94,11 +101,14 @@ function Artworks() {
                 <Hover
                   onMouseEnter={() => setHoveredId(a.id)}
                   onMouseLeave={() => setHoveredId(null)}
-                  onClick={() => navigate(`${pageURLs[pages.artworks]}/${a.id}`)}
+                  onClick={() =>
+                    navigate(`${pageURLs[pages.artworks]}/${a.id}?${searchParams.toString()}`, {
+                      state: { from: location.pathname + location.search },
+                    })
+                  }
                 >
                   <Card
                     sx={{
-                      minHeight: 100,
                       backgroundColor:
                         hoveredId === a.id
                           ? theme.card.color.background.success
@@ -118,14 +128,13 @@ function Artworks() {
                         </IconButton>
                       )}
                     </CardTitle>
-
                     <CardContent>
-                      <Typography variant='subTitle'>
-                        <strong>{formatMessage({ id: 'artist' })}:</strong> {a.artistName}
+                      <Typography variant='subTitle' color='default'>
+                        <strong>Artist:</strong> {a.artistName}
                       </Typography>
                       {a.yearCreated && (
-                        <Typography variant='subTitle'>
-                          <strong>{formatMessage({ id: 'year' })}:</strong> {a.yearCreated}
+                        <Typography variant='subTitle' color='default'>
+                          <strong>Year:</strong> {a.yearCreated}
                         </Typography>
                       )}
                     </CardContent>
@@ -138,9 +147,9 @@ function Artworks() {
           <Box sx={{ mt: 'auto', p: 3, display: 'flex', justifyContent: 'center' }}>
             <Pagination
               page={filters.page}
-              totalPages={totalPages}
-              onChange={handlePageChange}
-              disabled={isFetching}
+              totalPages={Math.ceil(totalItems / filters.size)}
+              onChange={(p) => updateSearch({ page: p })}
+              disabled={isLoading}
             />
           </Box>
         </Box>
@@ -149,7 +158,7 @@ function Artworks() {
       {deleteDialog.open && (
         <Dialog open onClose={() => setDeleteDialog({ open: false, id: null, error: null })}>
           <Box sx={{ p: 2, minWidth: 300 }}>
-            <Typography align='center'>{formatMessage({ id: 'delete_confirm' })}</Typography>
+            <Typography align='center'>Are you sure you want to delete this artwork?</Typography>
             {deleteDialog.error && (
               <Typography color='error' align='center' sx={{ mt: 1 }}>
                 {deleteDialog.error}
@@ -157,30 +166,29 @@ function Artworks() {
             )}
             <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center', gap: 2 }}>
               <Button onClick={() => setDeleteDialog({ open: false, id: null, error: null })}>
-                {formatMessage({ id: 'cancel' })}
+                Cancel
               </Button>
-              <Button onClick={() => handleDelete(deleteDialog.id)}>
-                {formatMessage({ id: 'delete' })}
-              </Button>
+              <Button onClick={() => handleDelete(deleteDialog.id)}>Delete</Button>
             </Box>
           </Box>
         </Dialog>
       )}
 
-      {successMessage && (
-        <Snackbar
-          open
-          message={successMessage}
-          onClose={() => setSuccessMessage('')}
-          severity='success'
-          autoHideDuration={3000}
-        />
-      )}
+      <Snackbar
+        open={notification.open}
+        message={notification.message}
+        severity={notification.type}
+        onClose={() => setNotification((prev) => ({ ...prev, open: false }))}
+      />
 
       <FloatingActionButton
-        icon={<AddIcon size={32} color={theme.button.color.primary.text} />}
-        to={`${pageURLs[pages.artworks]}/new`}
-        ariaLabel={formatMessage({ id: 'add_artwork' })}
+        icon={<AddIcon color={theme.button.color.primary.text} />}
+        ariaLabel='Add artwork'
+        to={{
+          pathname: `${pageURLs[pages.artworks]}/new`,
+          search: searchParams.toString(),
+          state: { from: location.pathname + location.search },
+        }}
       />
     </>
   );

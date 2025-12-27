@@ -17,23 +17,20 @@ function Default() {
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
-        gap:'10px',
-        
+        gap: '10px',
       }}
     >
-      <Typography variant="title">
-        {formatMessage({ id: 'title' })}
-      </Typography>
+      <Typography variant='title'>{formatMessage({ id: 'title' })}</Typography>
 
-      <Typography variant="subtitle" >
-        {formatMessage({ id: 'subtitle' })}
-      </Typography>
+      <Typography variant='subtitle'>{formatMessage({ id: 'subtitle' })}</Typography>
 
       <div style={{ marginTop: '30px' }}>
-        <Link to={{ pathname: `${pagesURLs[pages.artworks]}` }}> 
-          <Button variant="text">
-            {formatMessage({ id: 'default' })}
-          </Button>
+        <Link
+          to={{
+            pathname: pagesURLs[pages.artworks],
+          }}
+        >
+          <Button variant='text'>{formatMessage({ id: 'default' })}</Button>
         </Link>
       </div>
     </div>

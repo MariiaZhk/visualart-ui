@@ -25,13 +25,7 @@ const Snackbar = ({
       onClose={onClose}
       anchorOrigin={{ vertical, horizontal }}
     >
-      <Alert
-        onClose={onClose}
-        severity={severity}
-        sx={{ width: '100%' }}
-        variant='filled'
-        autoHideDuration={autoHideDuration}
-      >
+      <Alert onClose={onClose} severity={severity} sx={{ width: '100%' }} variant='filled'>
         {message}
       </Alert>
     </SnackbarMUI>

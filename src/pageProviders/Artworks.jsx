@@ -1,4 +1,4 @@
-import ArtworksPage from 'pages/artworks';
+import ArtworksPage from 'pages/artworks/index';
 import React from 'react';
 import PageContainer from './components/PageContainer';
 
